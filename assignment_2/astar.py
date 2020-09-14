@@ -111,7 +111,7 @@ def best_first_search(map_obj, heuristic_func, cost_func, tick):
                     kid = node
             for node in closed:
                 if node == kid:
-                    kid == node
+                    kid = node
         
             X.kids.append(kid)
 
