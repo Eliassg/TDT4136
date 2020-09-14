@@ -22,6 +22,19 @@ def manhattan_distance(map_obj, position):
     goal = map_obj.get_goal_pos()
     return abs(position[0] - goal[0]) + abs(position[1] - goal[1])
 
+def moving_manhattan(map_obj, position):
+    """ Uses manhattan distance to make an admissible estimate cost goal,
+        but considering known facts that our goal is moving 1/4 of our speed
+        in negative x-direction """
+
+    goal = map_obj.get_goal_pos()
+    goal_est = abs(position[0] - goal[0]) + abs(position[1] - goal[1]) #manhattan_distance()
+    displacement_est = goal_est / 4 # Friend is moving 1/4 of our speed
+    expected_goal = goal[0] - goal_est , goal[1]
+    return abs(position[0] - expected_goal[0]) + abs(position[1] - expected_goal[1]) #manhattan_distance()
+
+
+
 def cost_function(map_obj,next_pos):
     """ Determines cost of a cell so that different cell costs are taken
         account of in the total cost """
@@ -30,12 +43,12 @@ def cost_function(map_obj,next_pos):
 
 
 
-def attach_and_eval(map_obj,child, parent, cost_function):
+def attach_and_eval(map_obj,child, parent, cost_function, heuristic_func):
     """ Attaches a child node to a node that is now considered its best parent """
     
     child.best_parent = parent
     child.g = parent.g + cost_function(map_obj, child.position)
-    child.h = manhattan_distance(map_obj, child.position)
+    child.h = heuristic_func(map_obj, child.position)
 
 def propagate_path_improvements(map_obj, parent):
     """ Propagation of path improvements through children and possible
@@ -49,7 +62,7 @@ def propagate_path_improvements(map_obj, parent):
             propagate_path_improvements(map_obj, kid.position)
 
 
-def best_first_search(map_obj, heuristic_func, cost_func):
+def best_first_search(map_obj, heuristic_func, cost_func, tick):
     """ Implementation of best first search based on handed out pseudocode """
     
     closed = []
@@ -103,14 +116,19 @@ def best_first_search(map_obj, heuristic_func, cost_func):
             X.kids.append(kid)
 
             if kid not in open_ and kid not in closed:
-                attach_and_eval(map_obj, kid, X, cost_function)
+                attach_and_eval(map_obj, kid, X, cost_function, heuristic_func)
                 open_.append(kid)
                 open_.sort()
             
             elif X.g + cost_function(map_obj, kid.position) < kid.g:
-                attach_and_eval(map_obj, kid, X, cost_function)
+                attach_and_eval(map_obj, kid, X, cost_function, heuristic_func)
                 if kid in closed:
                     propagate_path_improvements(map_obj, X)
+
+        if tick is True:
+            map_obj.tick()
+            goal_node = search_Node(map_obj.get_goal_pos()) # update inside loop if goal changes during iterations
+
 
 
     return False
@@ -124,18 +142,20 @@ def main():
     map_obj = Map.Map_Obj(task = 4)
     start_position = map_obj.get_start_pos()
     int_map, str_map = map_obj.get_maps()
-    goal_node = search_Node(map_obj.get_goal_pos())
+    goal_position = map_obj.get_goal_pos()
+
+    map_obj.show_map()
     
     path = best_first_search(map_obj, manhattan_distance, cost_function)
     print("Starting position: ", start_position)
-    print("Goal position: ", goal_node.position)
+    print("Goal position: ", goal_position)
 
 
     try:
         draw_path(map_obj, path)
         print("Drawing path...")
     except TypeError:
-        print("Path does not exist")
+        print("Path does not exist :( ")
 
     map_obj.show_map()
 
