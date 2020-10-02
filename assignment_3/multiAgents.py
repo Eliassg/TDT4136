@@ -15,6 +15,8 @@
 from util import manhattanDistance
 from game import Directions
 import random, util
+import math
+import sys
 
 from game import Agent
 
@@ -135,7 +137,56 @@ class MinimaxAgent(MultiAgentSearchAgent):
         Returns whether or not the game state is a losing state
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def minimax_decision(state):
+            ''' returns an action '''
+
+            legaldict = {} 
+            for a in state.getLegalActions(0):
+                legaldict[a] = (min_value(state.generateSuccessor(0, a), 1, 1))
+        
+            sortedlegal = sorted(legaldict.items(), key=lambda util: util[1])
+
+            return sortedlegal[-1][0]        
+
+        def max_value(state, depth):
+            ''' returns a utility value '''
+
+            legal_actions = state.getLegalActions(0)
+            if not legal_actions or depth == self.depth: #terminal test
+                return self.evaluationFunction(state)
+            
+            v = - math.inf # initialize utility value
+
+            # index for pacman is 0
+
+            for a in legal_actions:
+                v = max(v, min_value(state.generateSuccessor(0,a), depth + 1, 0 + 1))
+            
+            return v
+
+        def min_value(state, depth, index):
+            ''' returns a utility value '''
+
+            legal_actions = state.getLegalActions(index)
+            if not legal_actions:   #terminal test
+                return self.evaluationFunction(state)
+            
+            v = math.inf # initialize utility value
+
+            if index == state.getNumAgents() - 1: # last ghost
+                for a in legal_actions:
+                    v = min(v, max_value(state.generateSuccessor(index, a), depth))
+            else:
+                for a in state.getLegalActions(index):
+                    v = min(v, min_value(state.generateSuccessor(index, a), depth, index+1))
+
+            return v
+        
+
+        return minimax_decision(gameState) # return action
+
+                 
 
 class AlphaBetaAgent(MultiAgentSearchAgent):
     """
@@ -147,7 +198,66 @@ class AlphaBetaAgent(MultiAgentSearchAgent):
         Returns the minimax action using self.depth and self.evaluationFunction
         """
         "*** YOUR CODE HERE ***"
-        util.raiseNotDefined()
+
+        def max_value(state, depth, alfa, beta):
+            ''' returns a utility value '''
+            legal_actions = state.getLegalActions(0)
+            if not legal_actions or depth == self.depth: # terminal
+                return self.evaluationFunction(state)
+            
+            v = - math.inf
+
+            if depth == 0:    
+                best_action = legal_actions[0]
+
+            for a in legal_actions:
+                state_new = state.generateSuccessor(0,a)
+                v_new = min_value(state_new, depth + 1, 0 + 1, alfa, beta)
+                if v_new > v:
+                    v = v_new
+                    if depth == 0:
+                        best_action = a
+
+                if v > beta:
+                    return v
+                alfa = max(alfa, v)
+
+            if depth == 0:
+                return best_action
+
+            return v
+
+
+        def min_value(state, depth, index, alfa, beta):
+            ''' returns a utility value'''
+
+            legal_actions = state.getLegalActions(index)
+            if not legal_actions:   #terminal test
+                return self.evaluationFunction(state)
+            
+            v = math.inf
+
+            for a in legal_actions:
+                state_new = state.generateSuccessor(index, a)
+                if index == state.getNumAgents() - 1: #last ghost
+                    v_new = max_value(state_new, depth, alfa, beta)
+                else:
+                    v_new = min_value(state_new, depth, index + 1, alfa, beta)
+                v = min(v, v_new)
+                if v < alfa:
+                    return v
+                beta = min(beta,v)
+            return v
+
+        def ab_search(state):
+            ''' returns an action '''
+
+            v = max_value(state, 0, -math.inf, math.inf)
+            return v
+
+        return ab_search(gameState)
+
+                
 
 class ExpectimaxAgent(MultiAgentSearchAgent):
     """
