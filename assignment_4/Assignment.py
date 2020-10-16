@@ -14,6 +14,9 @@ class CSP:
         # the variable pair (i, j)
         self.constraints = {}
 
+        self.backtracks = 0
+        self.failtracks = 0
+
     def add_variable(self, name, domain):
         """Add a new variable to the CSP. 'name' is the variable name
         and 'domain' is a list of the legal values for the variable.
@@ -108,8 +111,28 @@ class CSP:
         assignments and inferences that took place in previous
         iterations of the loop.
         """
-        # TODO: IMPLEMENT THIS
-        pass
+        
+        self.backtracks += 1
+        # return 'assignment' when all of the variables in 'assignment' have lists of length one
+        if all(len(variable) == 1 for variable in assignment.values()):
+            return assignment
+        
+        var = self.select_unassigned_variable(assignment)
+
+        for value in self.order_domain_values(assignment,var):
+            assignment_copy = copy.deepcopy(assignment)
+            assignment_copy[var] = [value]
+
+            if self.inference(assignment_copy, self.get_all_arcs()):
+                result = self.backtrack(assignment_copy)
+                if result:
+                    return result
+        self.failtracks += 1
+        return None
+
+    def order_domain_values(self, assignment, var):
+        '''Returns list of legal values for 'variable' in any order i.e. no heuristics'''
+        return assignment[var]
 
     def select_unassigned_variable(self, assignment):
         """The function 'Select-Unassigned-Variable' from the pseudocode
@@ -117,8 +140,11 @@ class CSP:
         in 'assignment' that have not yet been decided, i.e. whose list
         of legal values has a length greater than one.
         """
-        # TODO: IMPLEMENT THIS
-        pass
+        for value in assignment:
+            #find the first value of the variables that have not yet been decided
+            if len(assignment[value]) > 1:
+                return value
+        return None
 
     def inference(self, assignment, queue):
         """The function 'AC-3' from the pseudocode in the textbook.
@@ -126,8 +152,21 @@ class CSP:
         the lists of legal values for each undecided variable. 'queue'
         is the initial queue of arcs that should be visited.
         """
-        # TODO: IMPLEMENT THIS
-        pass
+        while queue:
+            i, j = queue.pop(0) #pops arbitrary arc
+            if self.revise(assignment, i, j):
+                if not assignment[i]:
+                    #domain is empty
+                    return False
+
+                neighbor = self.get_all_neighboring_arcs(i)
+                for neighbors in neighbor:
+                    if neighbor[0] != j:
+                        #add to queue all arcs (X_k,X_i) where X_k is a neighbor of X_i
+                        queue.append(neighbors)
+        #arc consistent
+        return True
+
 
     def revise(self, assignment, i, j):
         """The function 'Revise' from the pseudocode in the textbook.
@@ -138,8 +177,21 @@ class CSP:
         between i and j, the value should be deleted from i's list of
         legal values in 'assignment'.
         """
-        # TODO: IMPLEMENT THIS
-        pass
+        revised = False
+
+        for x in assignment[i]:
+            match = False
+            #check for corresponding legal value y in j's domain for every x in i
+            for y in assignment[j]:
+                if (x, y) in self.constraints[i][j]:
+                    match = True 
+            if not match: #remove x from i's domain
+                assignment[i].remove(x)
+                revised = True
+        return revised
+
+
+
 
 
 def create_map_coloring_csp():
@@ -188,8 +240,8 @@ def create_sudoku_csp(filename):
 
     return csp
 
-
-def print_sudoku_solution(solution):
+#ugly output
+'''def print_sudoku_solution(solution):
     """Convert the representation of a Sudoku solution as returned from
     the method CSP.backtracking_search(), into a human readable
     representation.
@@ -201,4 +253,33 @@ def print_sudoku_solution(solution):
                 print('|'),
         print("")
         if row == 2 or row == 5:
-            print('------+-------+------')
+            print('------+-------+------')'''
+
+def print_sudoku_solution(solution):
+    """Convert the representation of a Sudoku solution as returned from
+    the method CSP.backtracking_search(), into a human readable
+    representation.
+    """
+    for row in range(9):
+        for col in range(9):
+            print(solution['%d-%d' % (row, col)][0], ' ', end=''),
+            if col == 2 or col == 5:
+                print('|', ' ', end=''),
+        print("")
+        if row == 2 or row == 5:
+            print('---------+-----------+---------')
+
+
+def main():
+    levels = ("easy", "medium", "hard", "veryhard")
+    for level in levels:
+        print(f"\n {level} \n ")
+        csp = create_sudoku_csp(f"{level}.txt")
+        solution = csp.backtracking_search()
+        print(f"Number of backtracks: {csp.backtracks}")
+        print(f"Number of failed backtracks: {csp.failtracks}")
+        print_sudoku_solution(solution)
+    
+if __name__ == "__main__":
+    main()
+
