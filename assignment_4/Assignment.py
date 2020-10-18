@@ -262,7 +262,7 @@ def print_sudoku_solution(solution):
     """
     for row in range(9):
         for col in range(9):
-            print(solution['%d-%d' % (row, col)][0], ' ', end=''),
+            print(solution['%d-%d' % (row, col)][0], ' ', end='')
             if col == 2 or col == 5:
                 print('|', ' ', end=''),
         print("")
