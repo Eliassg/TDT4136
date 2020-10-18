@@ -1,6 +1,11 @@
 # TDT4136
 ## Introduction to Artificial Intelligence
 
+## Shortcuts to assignment reports
+
+* [Shortest path in 2D grid with A* algorithm](https://github.com/Eliassg/TDT4136/blob/master/assignment_2/TDT4136_Assignment_2_eliassg.pdf)
+* [Minimax/alpha-beta-pruning adversarial search - Pacman](https://github.com/Eliassg/TDT4136/blob/master/assignment_3/TDT4136_Assignment_3_eliassg.pdf) 
+
 
 ## Course content
 The subject starts with a description of problem solving methods by means of heuristic search. Therafter, various knowledge representation languages and inference methods for automatic problem solving. Representation in form of predicate logic, frames and semantic nets are treated, and connected to the main forms of reasoning - especially rule based reasoning. Furthermore, architectures that integrates various resoning methods, agent based architectures and architectures for interactive problem solving. Numerous applicaton examples are given to demonstrate the methods.
