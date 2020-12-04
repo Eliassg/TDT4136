@@ -5,6 +5,7 @@
 
 * [Shortest path in 2D grid with A* algorithm](https://github.com/Eliassg/TDT4136/blob/master/assignment_2/TDT4136_Assignment_2_eliassg.pdf)
 * [Minimax/alpha-beta-pruning adversarial search - Pacman](https://github.com/Eliassg/TDT4136/blob/master/assignment_3/TDT4136_Assignment_3_eliassg.pdf) 
+* [General solver for CSP using AC-3 algorithm - Sudoku](https://github.com/Eliassg/TDT4136/blob/master/assignment_4/TDT4136_Assignment_4_eliassg.pdf)
 
 
 ## Course content
