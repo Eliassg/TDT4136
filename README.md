@@ -21,6 +21,9 @@ Knowledge: The candidate will gain knowledge of:
 * multiagent environments and game theory principles and some methods 
 * ethics related problems in AI
 
-Skills: decide which types of intelligence and agents are needed in a certain type of environment and design the agent accordingly -design knowledge-based systems using the suitable type of representation, inference and problem solving method -be able to identify possible ethical problems for a given a problem
+Skills:
+* decide which types of intelligence and agents are needed in a certain type of environment and design the agent accordingly 
+* design knowledge-based systems using the suitable type of representation, inference and problem solving method 
+* be able to identify possible ethical problems for a given a problem
 
 General competence: Know AI's basis taken from logic and cognitive sciences.
